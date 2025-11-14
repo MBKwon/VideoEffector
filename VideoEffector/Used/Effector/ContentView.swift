@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var selectedURL: URL? = nil
     @State private var saveProgress: Double = 0.0
 
+    @State private var position: Int = 0
     @State private var shaderType: Int = 0
     @State private var detectorType: Int = 0
 
@@ -43,6 +44,12 @@ struct ContentView: View {
 
             Spacer()
 
+            Picker("Camera Position", selection: $position) {
+                Text("Front").tag(0)
+                Text("Rear").tag(1)
+            }
+            .pickerStyle(.segmented)
+
             Picker("Shader", selection: $shaderType) {
                 Text("Blur").tag(0)
                 Text("Hightlight").tag(1)
@@ -55,14 +62,24 @@ struct ContentView: View {
                 Text("Word").tag(2)
             }
             .pickerStyle(.segmented)
-            .onChange(of: detectorType.self) { oldValue, newValue in
-                if newValue == 2 { showWordSheet = true }
+            .onChange(of: detectorType.self, initial: true) { oldValue, newValue in
+                switch newValue {
+                case 0:
+                    self.vm.detectors = [FaceDetector()]
+                case 1:
+                    self.vm.detectors = [TextDetector()]
+                case 2:
+                    self.vm.detectors = [TextRecognizer(with: $targetWord)]
+                    showWordSheet = true
+                default:
+                    self.vm.detectors = []
+                }
             }
 
             HStack(spacing: 12) {
                 Button("라이브 시작") {
                     isSessionAlive = true
-                    vm.startVideoSession(with: .camera(position: .front))
+                    vm.startVideoSession(with: .camera(position: .back))
                 }
                 .buttonStyle(.bordered)
 

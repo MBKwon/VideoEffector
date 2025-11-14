@@ -9,7 +9,11 @@ import CoreVideo
 import Vision
 
 final class TextDetector {
-    private let textDetectionRequest = VNDetectTextRectanglesRequest()
+    private let textDetectionRequest = {
+        let request = VNDetectTextRectanglesRequest()
+        request.reportCharacterBoxes = true
+        return request
+    }()
     private let requestHandler = VNSequenceRequestHandler()
 }
 

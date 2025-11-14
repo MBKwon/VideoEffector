@@ -22,16 +22,15 @@ final class BlurShader {
 
     private var cancellables: Set<AnyCancellable> = .init()
 
-    init(with pixelBufferProvider: PixelBufferProvider, receiver: VideoFrameReceiver, detectors: [Detectable] = []) {
+    init(with pixelBufferProvider: PixelBufferProvider, receiver: VideoFrameReceiver,
+         detect: @escaping (CVPixelBuffer) -> [VNDetectedObjectObservation]) {
         self.frameReceiver = receiver
 
         setupMetal()
         pixelBufferProvider.$pixelBuffer
             .compactMap { $0 }
             .sink { [weak self] pixelBuffer in
-                self?.drawFrame(with: pixelBuffer, observations: detectors.flatMap {
-                    $0.detectObjects(pixelBuffer: pixelBuffer)
-                })
+                self?.drawFrame(with: pixelBuffer, observations: detect(pixelBuffer))
             }
             .store(in: &cancellables)
     }
