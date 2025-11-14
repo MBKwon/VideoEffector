@@ -10,7 +10,7 @@ import Combine
 import CoreVideo
 import UIKit
 
-class CameraCaptureModel: PixelBufferProvider {
+final class CameraCaptureModel: PixelBufferProvider {
     private let captureSession = AVCaptureSession()
     private let videoOutput = AVCaptureVideoDataOutput()
     private(set) var position: AVCaptureDevice.Position = .back
@@ -20,9 +20,6 @@ class CameraCaptureModel: PixelBufferProvider {
         super.init()
         setupCamera(from: position)
     }
-}
-
-extension CameraCaptureModel {
 
     func startSession() {
         DispatchQueue.global(qos: .background).async { [weak self] in
@@ -35,8 +32,10 @@ extension CameraCaptureModel {
             self?.captureSession.stopRunning()
         }
     }
+}
 
-    private func setupCamera(from position: AVCaptureDevice.Position) {
+private extension CameraCaptureModel {
+    func setupCamera(from position: AVCaptureDevice.Position) {
         captureSession.sessionPreset = .medium
         
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera,

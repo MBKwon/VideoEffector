@@ -6,11 +6,16 @@
 //
 
 import AVFoundation
+import Combine
 import CoreVideo
 import UIKit
 
 protocol VideoFrameReceiver: AnyObject {
     func didRenderFrame(image: UIImage)
+}
+
+class PixelBufferProvider: NSObject {
+    @Published var pixelBuffer: CVPixelBuffer?
 }
 
 enum VideoSourceType {
