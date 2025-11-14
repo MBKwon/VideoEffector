@@ -16,9 +16,20 @@ protocol VideoFrameReceiver: AnyObject {
 enum VideoSourceType {
     case camera(position: AVCaptureDevice.Position)
     case video(url: URL)
+
+    var videoProvider: VideoProviderType {
+        switch self {
+        case .camera(let position):
+            let model = CameraCaptureModel(from: position)
+            model.startSession()
+            return .camera(model: model)
+        case .video(let url):
+            return .videoPlayer(model: .init(url: url))
+        }
+    }
 }
 
-enum VideoType {
+enum VideoProviderType {
     case camera(model: CameraCaptureModel)
     case videoPlayer(model: VideoPlayerModel)
 

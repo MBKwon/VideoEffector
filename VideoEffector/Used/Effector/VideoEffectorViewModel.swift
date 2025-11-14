@@ -14,14 +14,14 @@ final class VideoEffectorViewModel: NSObject, ObservableObject {
     
     @Published var previewImage: UIImage?
 
-    private var videoType: VideoType?
+    private var videoProvider: VideoProviderType?
     var currentSourceType: VideoSourceType? {
-        videoType?.sourceType
+        videoProvider?.sourceType
     }
 
     private var blurShader: BlurShader?
     var player: AVPlayer? {
-        if case .videoPlayer(let model) = videoType {
+        if case .videoPlayer(let model) = videoProvider {
             return model.player
         } else {
             return nil
@@ -29,23 +29,15 @@ final class VideoEffectorViewModel: NSObject, ObservableObject {
     }
 
     func startVideoSession(with source: VideoSourceType) {
-        switch source {
-        case .camera(let position):
-            let model = CameraCaptureModel(from: position)
-            model.startSession()
-            videoType = .camera(model: model)
-        case .video(let url):
-            videoType = .videoPlayer(model: .init(url: url))
-        }
-
-        if let pixelBufferProvider = videoType?.pixelBufferProvider {
+        videoProvider = source.videoProvider
+        if let pixelBufferProvider = videoProvider?.pixelBufferProvider {
             blurShader = BlurShader(with: pixelBufferProvider, receiver: self,
                                     detectors: [FaceDetector()])
         }
     }
 
     func stopVideoSession() {
-        switch videoType {
+        switch videoProvider {
         case .camera(let model):
             model.stopSession()
         case .videoPlayer(let model):
